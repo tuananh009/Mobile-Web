@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:mvc="http://www.springframework.org/schema/mvc"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans     
+   http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+   http://www.springframework.org/schema/context 
+   http://www.springframework.org/schema/context/spring-context-3.0.xsd
+   http://www.springframework.org/schema/mvc 
+   http://www.springframework.org/schema/mvc/spring-mvc-3.0.xsd">
+
+	<!-- Cấu hình dự án Spring sử dụng annotation -->
+	<mvc:annotation-driven validator="validator" />
+
+	<!-- Cấu hình package chứa controllers -->
+	<context:component-scan base-package="bkap" />
+	<context:component-scan
+		base-package="bkap.happyshop.controller" />
+	<context:component-scan
+		base-package="bkap.happyshop.dao" />
+	<context:component-scan
+		base-package="bkap.happyshop.service" />
+	<context:component-scan
+		base-package="bkap.happyshop.entity" />
+	<context:component-scan
+		base-package="bkap.happyshop.bean" />
+	<context:component-scan
+		base-package="bkap.happyshop.admin.controller" />
+	<!-- Cấu hình thư mục chứa các trang view (jsp) -->
+	<bean
+		class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+		<property name="prefix" value="/WEB-INF/views/" />
+		<property name="suffix" value=".jsp" />
+	</bean>
+
+	<!-- Cấu hình thư mục tài nguyên public -->
+	<mvc:resources location="/static/" mapping="/static/**"></mvc:resources>
+
+	<!-- Cấu hình I18N -->
+	<!-- 1. Cấu hình resource -->
+	<bean id="messageSource"
+		class="org.springframework.context.support.ResourceBundleMessageSource">
+		<property name="basename" value="i18n.account" />
+		<property name="defaultEncoding" value="UTF-8" />
+	</bean>
+
+	<!-- Cấu hình lớp lưu trữ giá trị ngôn ngữ i18n | SessionLocaleResolver -->
+	<bean id="localeResolver"
+		class="org.springframework.web.servlet.i18n.CookieLocaleResolver">
+		<property name="defaultLocale" value="en_US" />
+		<property name="cookieName" value="myAppLocaleCookie"></property>
+		<property name="cookieMaxAge" value="3600"></property>
+	</bean>
+
+	<!-- Cấu hình biến thay đổi ngôn ngữ -->
+	<mvc:interceptors>
+		<bean
+			class="org.springframework.web.servlet.i18n.LocaleChangeInterceptor">
+			<property name="paramName" value="lang" />
+		</bean>
+	</mvc:interceptors>
+
+	<!-- Cấu hình validate dùng i18n -->
+	<bean id="validator"
+		class="org.springframework.validation.beanvalidation.LocalValidatorFactoryBean">
+		<property name="validationMessageSource" ref="messageSource" />
+	</bean>
+
+	<!-- Cấu hình kết nối csdl -->
+	<bean id="dataSource"
+		class="org.springframework.jdbc.datasource.DriverManagerDataSource">
+		<property name="driverClassName"
+			value="com.microsoft.sqlserver.jdbc.SQLServerDriver"></property>
+		<property name="url"
+			value="jdbc:sqlserver://localhost:1433;databaseName=Mobile;encrypt=true;trustServerCertificate=true;"></property>
+		<property name="username" value="sa"></property>
+		<property name="password" value="187249"></property>
+	</bean>
+
+	<!-- Cấu hình session factory -->
+	<bean id="sessionFactory"
+		class="org.springframework.orm.hibernate5.LocalSessionFactoryBean">
+		<property name="dataSource" ref="dataSource"></property>
+		<property name="packagesToScan" value="bkap.happyshop.entity"></property>
+		<property name="hibernateProperties">
+			<props>
+				<prop key="hibernate.show_sql">true</prop>
+				<prop key="hibernate.dialect">org.hibernate.dialect.SQLServer2008Dialect</prop>
+				<prop key="hibernate.current_session_context_class">org.springframework.orm.hibernate5.SpringSessionContext
+				</prop>
+			</props>
+		</property>
+	</bean>
+
+	<bean id="multipartResolver"
+		class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
+		<property name="maxUploadSize" value="5000000"></property>
+	</bean>
+</beans>
